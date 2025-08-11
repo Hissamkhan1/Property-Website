@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { propertyService } from '../services/propertyService';
 import { agentService } from '../services/agentService';
+import { inquiryService } from '../services/inquiryService';
 import { Property } from '../types/Property';
 import { Agent } from '../types/Agent';
+import { Inquiry } from '../types/Inquiry';
 import AddPropertyForm from './AddPropertyForm';
 import AgentForm from './AgentForm';
 
@@ -11,13 +13,14 @@ export default function AdminPanel() {
   const { currentUser, logout } = useAuth();
   const [properties, setProperties] = useState<Property[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAgentForm, setShowAgentForm] = useState(false);
   const [editingAgent, setEditingAgent] = useState<Agent | undefined>(undefined);
 
   useEffect(() => {
-    Promise.all([loadProperties(), loadAgents()]).finally(() => setLoading(false));
+    Promise.all([loadProperties(), loadAgents(), loadInquiries()]).finally(() => setLoading(false));
   }, []);
 
   async function loadProperties() {
@@ -35,6 +38,15 @@ export default function AdminPanel() {
       setAgents(list);
     } catch (error) {
       console.error('Error loading agents:', error);
+    }
+  }
+
+  async function loadInquiries() {
+    try {
+      const list = await inquiryService.getInquiries();
+      setInquiries(list);
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -185,6 +197,40 @@ export default function AdminPanel() {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">No agents added yet.</div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">Inquiries</h2>
+        {inquiries.length ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="text-gray-600">
+                <tr>
+                  <th className="px-3 py-2">When</th>
+                  <th className="px-3 py-2">Property</th>
+                  <th className="px-3 py-2">Name</th>
+                  <th className="px-3 py-2">Email</th>
+                  <th className="px-3 py-2">Phone</th>
+                  <th className="px-3 py-2">Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inquiries.map((q) => (
+                  <tr key={q.id} className="border-t">
+                    <td className="px-3 py-2">{(q.createdAt as any)?.toDate?.()?.toLocaleString?.() || ''}</td>
+                    <td className="px-3 py-2">{q.propertyTitle}</td>
+                    <td className="px-3 py-2">{q.name}</td>
+                    <td className="px-3 py-2">{q.email}</td>
+                    <td className="px-3 py-2">{q.phone}</td>
+                    <td className="px-3 py-2 max-w-[320px] truncate">{q.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-gray-500">No inquiries yet.</div>
         )}
       </div>
     </div>
