@@ -41,7 +41,10 @@ export default function EditPropertyModal({ property, onClose, onSuccess }: Edit
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setNewImages(prev => [...prev, ...files]);
+    // reset input so user can re-select same files
+    e.target.value = '';
   };
 
   const removeExistingImage = (index: number) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Home as HomeIcon, Shield, Users, Star, MapPin, DollarSign, Building, ChevronRight, Phone, Mail, Award } from 'lucide-react';
+import { Search, Home as HomeIcon, Star, MapPin, Building, ChevronRight, Phone, Mail } from 'lucide-react';
 import { propertyService } from '../services/propertyService';
 import { agentService } from '../services/agentService';
 import { Property } from '../types/Property';
@@ -171,17 +171,17 @@ export default function Home() {
                   />
                 </div>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 flex items-center justify-center text-sm">₨</span>
                   <select
                     value={searchData.price}
                     onChange={(e) => setSearchData({...searchData, price: e.target.value})}
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                   >
                     <option value="">Price Range</option>
-                    <option value="0-100000">$0 - $100,000</option>
-                    <option value="100000-300000">$100,000 - $300,000</option>
-                    <option value="300000-500000">$300,000 - $500,000</option>
-                    <option value="500000+">$500,000+</option>
+                    <option value="0-100000">Pkr 0 - 100,000</option>
+                    <option value="100000-300000">Pkr 100,000 - 300,000</option>
+                    <option value="300000-500000">Pkr 300,000 - 500,000</option>
+                    <option value="500000+">Pkr 500,000+</option>
                   </select>
                 </div>
                 <div className="relative">
@@ -363,7 +363,7 @@ export default function Home() {
                       
                       <div className="flex items-center justify-between mb-4">
                         <div className="text-2xl font-bold text-blue-600">
-                          ${property.price.toLocaleString()}
+                          Pkr {property.price.toLocaleString()}
                         </div>
                         {property.bedrooms && property.bathrooms && (
                           <div className="flex space-x-4 text-sm text-gray-600">

@@ -192,7 +192,7 @@ export default function AdminPanel() {
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{property.title}</h3>
                   <p className="text-gray-600 mb-2">{property.location}</p>
-                  <p className="text-2xl font-bold text-green-600 mb-4">${property.price.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-green-600 mb-4">Pkr {property.price.toLocaleString()}</p>
                   <p className="text-gray-700 mb-4 line-clamp-2">{property.description}</p>
                   {property.bedrooms && property.bathrooms && (
                     <div className="flex space-x-4 text-sm text-gray-600 mb-4">
@@ -334,7 +334,7 @@ export default function AdminPanel() {
                         <div className="text-xs text-gray-500">{payment.customerEmail}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-2 font-semibold">${payment.amount.toLocaleString()}</td>
+                    <td className="px-3 py-2 font-semibold">PKr {payment.amount.toLocaleString()}</td>
                     <td className="px-3 py-2">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
                         payment.paymentMethod === 'easypaisa' 

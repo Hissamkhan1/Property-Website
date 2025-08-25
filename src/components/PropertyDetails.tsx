@@ -163,9 +163,9 @@ export default function PropertyDetails() {
                 <MapPin className="h-5 w-5 mr-2" />
                 <span>{property.location}</span>
               </div>
-              <div className="text-3xl font-bold text-blue-600 mb-4">
-                ${property.price.toLocaleString()}
-              </div>
+                              <div className="text-3xl font-bold text-blue-600 mb-4">
+                  Pkr {property.price.toLocaleString()}
+                </div>
             </div>
 
             {/* Property Features */}
@@ -262,7 +262,7 @@ export default function PropertyDetails() {
                   <div className="p-4">
                     <div className="text-sm text-gray-500 mb-1">{sp.location}</div>
                     <h4 className="font-semibold text-gray-900 truncate mb-2">{sp.title}</h4>
-                    <div className="text-blue-600 font-bold mb-3">${sp.price.toLocaleString()}</div>
+                    <div className="text-blue-600 font-bold mb-3">Pkr {sp.price.toLocaleString()}</div>
                     <button onClick={() => navigate(`/property/${sp.id}`)} className="text-sm text-white bg-blue-600 px-3 py-2 rounded hover:bg-blue-700">View</button>
                   </div>
                 </div>

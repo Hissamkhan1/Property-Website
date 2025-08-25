@@ -40,6 +40,9 @@ export default function AddPropertyForm({ onClose, onSuccess }: AddPropertyFormP
       // Create preview URLs for selected images
       const previews = selectedFiles.map(file => URL.createObjectURL(file));
       setImagePreviews(prev => [...prev, ...previews]);
+      
+      // Allow selecting the same files again by resetting the input
+      e.target.value = '';
     }
   };
 

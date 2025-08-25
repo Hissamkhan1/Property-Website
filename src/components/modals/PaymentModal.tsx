@@ -97,7 +97,7 @@ export default function PaymentModal({ open, onClose, propertyId, propertyTitle,
           </p>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
             <p className="text-sm text-green-800">
-              <strong>Amount:</strong> ${amount.toLocaleString()}<br />
+              <strong>Amount:</strong> PKr {amount.toLocaleString()}<br />
               <strong>Property:</strong> {propertyTitle}<br />
               <strong>Method:</strong> {paymentMethod === 'easypaisa' ? 'EasyPaisa' : 'Bank Transfer'}
             </p>
@@ -120,7 +120,7 @@ export default function PaymentModal({ open, onClose, propertyId, propertyTitle,
           <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800">
               <strong>Property:</strong> {propertyTitle}<br />
-              <strong>Amount:</strong> ${amount.toLocaleString()}
+              <strong>Amount:</strong> PKr {amount.toLocaleString()}
             </p>
           </div>
         </div>

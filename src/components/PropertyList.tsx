@@ -73,7 +73,7 @@ export default function PropertyList() {
               </h3>
               <p className="text-gray-600 mb-2">{property.location}</p>
               <p className="text-2xl font-bold text-green-600 mb-4">
-                ${property.price.toLocaleString()}
+                Pkr {property.price.toLocaleString()}
               </p>
               <p className="text-gray-700 mb-4">{property.description}</p>
               {property.bedrooms && property.bathrooms && (
