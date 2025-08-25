@@ -222,7 +222,7 @@ export default function Home() {
                 <div className="mt-4 flex items-center justify-between">
                   <div className="text-sm text-gray-700 font-medium">
                     {properties.length > 0 ? (
-                      `Found ${properties.length} property${properties.length !== 1 ? 'ies' : ''}`
+                      `Found ${properties.length} propert${properties.length !== 1 ? 'ies' : 'y'}`
                     ) : (
                       'No properties found'
                     )}
@@ -320,13 +320,22 @@ export default function Home() {
                           <HomeIcon className="h-16 w-16 text-gray-400" />
                         </div>
                       )}
-                      <div className="absolute top-4 right-4">
+                      <div className="absolute top-4 right-4 flex flex-col space-y-2">
                         <div className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-semibold">
                           {(() => {
                             const t = property.propertyType || '';
                             return t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Property';
                           })()}
                         </div>
+                        {property.status && property.status !== 'available' && (
+                          <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            property.status === 'booked' 
+                              ? 'bg-yellow-600 text-white' 
+                              : 'bg-red-600 text-white'
+                          }`}>
+                            {property.status === 'booked' ? 'Booked' : 'Sold'}
+                          </div>
+                        )}
                       </div>
                       {/* Arrow overlay on image */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">

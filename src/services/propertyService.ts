@@ -100,5 +100,19 @@ export const propertyService = {
       console.error('Error deleting property:', error);
       throw error;
     }
+  },
+
+  // Update property status (available/booked/sold)
+  async updatePropertyStatus(propertyId: string, status: 'available' | 'booked' | 'sold') {
+    try {
+      const propertyRef = doc(db, 'properties', propertyId);
+      await updateDoc(propertyRef, {
+        status: status,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error updating property status:', error);
+      throw error;
+    }
   }
 }; 

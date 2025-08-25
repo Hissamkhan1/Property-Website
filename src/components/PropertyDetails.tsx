@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Bed, Bath, Square, ArrowLeft, Phone, Mail, Share2 } from 'lucide-react';
+import { MapPin, Star, Bed, Bath, Square, ArrowLeft, Phone, Mail, Share2, CreditCard } from 'lucide-react';
 import { propertyService } from '../services/propertyService';
 import { Property } from '../types/Property';
 import InquiryModal from './modals/InquiryModal';
 import Lightbox from './modals/Lightbox';
+import PaymentModal from './modals/PaymentModal';
 
 export default function PropertyDetails() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ export default function PropertyDetails() {
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [paymentOpen, setPaymentOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -145,7 +147,18 @@ export default function PropertyDetails() {
           {/* Property Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.title}</h1>
+              <div className="flex items-center justify-between mb-2">
+                <h1 className="text-3xl font-bold text-gray-900">{property.title}</h1>
+                {property.status && property.status !== 'available' && (
+                  <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                    property.status === 'booked' 
+                      ? 'bg-yellow-600 text-white' 
+                      : 'bg-red-600 text-white'
+                  }`}>
+                    {property.status === 'booked' ? 'Booked' : 'Sold'}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center text-gray-600 mb-4">
                 <MapPin className="h-5 w-5 mr-2" />
                 <span>{property.location}</span>
@@ -201,13 +214,17 @@ export default function PropertyDetails() {
             <div className="flex space-x-4 pt-6">
               <button
                 onClick={() => setInquiryOpen(true)}
-                className="bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700"
+                className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center"
               >
-                Inquire
-              </button>
-              <button className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center">
                 <Mail className="h-5 w-5 mr-2" />
                 Send Message
+              </button>
+              <button
+                onClick={() => setPaymentOpen(true)}
+                className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center"
+              >
+                <CreditCard className="h-5 w-5 mr-2" />
+                Make Payment
               </button>
               <button className="bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                 <Share2 className="h-5 w-5" />
@@ -262,6 +279,14 @@ export default function PropertyDetails() {
         onClose={() => setInquiryOpen(false)}
         propertyId={id!}
         propertyTitle={property.title}
+      />
+
+      <PaymentModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        propertyId={id!}
+        propertyTitle={property.title}
+        amount={property.price}
       />
 
       <Lightbox

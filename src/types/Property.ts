@@ -13,4 +13,5 @@ export interface Property {
   bathrooms?: number;
   area?: number;
   propertyType?: 'house' | 'apartment' | 'condo' | 'villa';
+  status?: 'available' | 'booked' | 'sold';
 } 

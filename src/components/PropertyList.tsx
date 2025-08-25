@@ -54,6 +54,17 @@ export default function PropertyList() {
                     Click to view details
                   </div>
                 </div>
+                {property.status && property.status !== 'available' && (
+                  <div className="absolute top-4 right-4">
+                    <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                      property.status === 'booked' 
+                        ? 'bg-yellow-600 text-white' 
+                        : 'bg-red-600 text-white'
+                    }`}>
+                      {property.status === 'booked' ? 'Booked' : 'Sold'}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             <div className="p-6">

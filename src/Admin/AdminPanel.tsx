@@ -3,9 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { propertyService } from '../services/propertyService';
 import { agentService } from '../services/agentService';
 import { inquiryService } from '../services/inquiryService';
+import { paymentService } from '../services/paymentService';
 import { Property } from '../types/Property';
 import { Agent } from '../types/Agent';
 import { Inquiry } from '../types/Inquiry';
+import { PaymentDetails, PaymentStatus } from '../types/Payment';
 import AddPropertyForm from './AddPropertyForm';
 import AgentForm from './AgentForm';
 
@@ -14,13 +16,14 @@ export default function AdminPanel() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [payments, setPayments] = useState<PaymentDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAgentForm, setShowAgentForm] = useState(false);
   const [editingAgent, setEditingAgent] = useState<Agent | undefined>(undefined);
 
   useEffect(() => {
-    Promise.all([loadProperties(), loadAgents(), loadInquiries()]).finally(() => setLoading(false));
+    Promise.all([loadProperties(), loadAgents(), loadInquiries(), loadPayments()]).finally(() => setLoading(false));
   }, []);
 
   async function loadProperties() {
@@ -50,6 +53,15 @@ export default function AdminPanel() {
     }
   }
 
+  async function loadPayments() {
+    try {
+      const list = await paymentService.getAllPayments();
+      setPayments(list);
+    } catch (error) {
+      console.error('Error loading payments:', error);
+    }
+  }
+
   async function handleDeleteProperty(propertyId: string) {
     if (window.confirm('Are you sure you want to delete this property?')) {
       try {
@@ -69,6 +81,37 @@ export default function AdminPanel() {
       } catch (error) {
         console.error('Error deleting agent:', error);
       }
+    }
+  }
+
+  async function handleStatusToggle(propertyId: string, currentStatus: string) {
+    try {
+      let newStatus: 'available' | 'booked' | 'sold';
+      
+      // Cycle through statuses: available -> booked -> sold -> available
+      if (currentStatus === 'available') {
+        newStatus = 'booked';
+      } else if (currentStatus === 'booked') {
+        newStatus = 'sold';
+      } else {
+        newStatus = 'available';
+      }
+      
+      await propertyService.updatePropertyStatus(propertyId, newStatus);
+      await loadProperties(); // Refresh the properties list
+    } catch (error) {
+      console.error('Error updating property status:', error);
+      alert('Failed to update property status. Please try again.');
+    }
+  }
+
+  async function handlePaymentStatusUpdate(paymentId: string, newStatus: PaymentStatus) {
+    try {
+      await paymentService.updatePaymentStatus(paymentId, newStatus);
+      await loadPayments(); // Refresh the payments list
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      alert('Failed to update payment status. Please try again.');
     }
   }
 
@@ -148,6 +191,18 @@ export default function AdminPanel() {
                   <div className="flex space-x-2">
                     <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
                     <button onClick={() => handleDeleteProperty(property.id)} className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
+                    <button 
+                      onClick={() => handleStatusToggle(property.id, property.status || 'available')}
+                      className={`px-3 py-1 rounded text-sm font-medium ${
+                        property.status === 'booked' 
+                          ? 'bg-yellow-600 text-white hover:bg-yellow-700' 
+                          : property.status === 'sold'
+                          ? 'bg-gray-600 text-white hover:bg-gray-700'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                    >
+                      {property.status === 'booked' ? 'Booked' : property.status === 'sold' ? 'Sold' : 'Available'}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -231,6 +286,97 @@ export default function AdminPanel() {
           </div>
         ) : (
           <div className="text-gray-500">No inquiries yet.</div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">Payments</h2>
+        {payments.length ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="text-gray-600">
+                <tr>
+                  <th className="px-3 py-2">Date</th>
+                  <th className="px-3 py-2">Property</th>
+                  <th className="px-3 py-2">Customer</th>
+                  <th className="px-3 py-2">Amount</th>
+                  <th className="px-3 py-2">Method</th>
+                  <th className="px-3 py-2">Status</th>
+                  <th className="px-3 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((payment) => (
+                  <tr key={payment.id} className="border-t">
+                    <td className="px-3 py-2">{(payment.createdAt as any)?.toDate?.()?.toLocaleString?.() || ''}</td>
+                    <td className="px-3 py-2">{payment.propertyTitle}</td>
+                    <td className="px-3 py-2">
+                      <div>
+                        <div className="font-medium">{payment.customerName}</div>
+                        <div className="text-xs text-gray-500">{payment.customerEmail}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 font-semibold">${payment.amount.toLocaleString()}</td>
+                    <td className="px-3 py-2">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        payment.paymentMethod === 'easypaisa' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {payment.paymentMethod === 'easypaisa' ? 'EasyPaisa' : 'Bank Transfer'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        payment.status === 'completed' 
+                          ? 'bg-green-100 text-green-800'
+                          : payment.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : payment.status === 'failed'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex space-x-2">
+                        {payment.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handlePaymentStatusUpdate(payment.id, 'completed')}
+                              className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700"
+                            >
+                              Complete
+                            </button>
+                            <button
+                              onClick={() => handlePaymentStatusUpdate(payment.id, 'failed')}
+                              className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700"
+                            >
+                              Fail
+                            </button>
+                          </>
+                        )}
+                        {payment.status === 'completed' && (
+                          <span className="text-green-600 text-xs">✓ Completed</span>
+                        )}
+                        {payment.status === 'failed' && (
+                          <button
+                            onClick={() => handlePaymentStatusUpdate(payment.id, 'pending')}
+                            className="bg-yellow-600 text-white px-2 py-1 rounded text-xs hover:bg-yellow-700"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-gray-500">No payments yet.</div>
         )}
       </div>
     </div>
