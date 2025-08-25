@@ -10,6 +10,7 @@ import { Inquiry } from '../types/Inquiry';
 import { PaymentDetails, PaymentStatus } from '../types/Payment';
 import AddPropertyForm from './AddPropertyForm';
 import AgentForm from './AgentForm';
+import EditPropertyModal from '../components/modals/EditPropertyModal';
 
 export default function AdminPanel() {
   const { currentUser, logout } = useAuth();
@@ -21,6 +22,7 @@ export default function AdminPanel() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAgentForm, setShowAgentForm] = useState(false);
   const [editingAgent, setEditingAgent] = useState<Agent | undefined>(undefined);
+  const [editingProperty, setEditingProperty] = useState<Property | undefined>(undefined);
 
   useEffect(() => {
     Promise.all([loadProperties(), loadAgents(), loadInquiries(), loadPayments()]).finally(() => setLoading(false));
@@ -163,6 +165,17 @@ export default function AdminPanel() {
         />
       )}
 
+      {editingProperty && (
+        <EditPropertyModal
+          property={editingProperty}
+          onClose={() => setEditingProperty(undefined)}
+          onSuccess={() => {
+            setEditingProperty(undefined);
+            loadProperties();
+          }}
+        />
+      )}
+
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">All Listed Properties</h2>
         {properties.length > 0 ? (
@@ -189,7 +202,12 @@ export default function AdminPanel() {
                     </div>
                   )}
                   <div className="flex space-x-2">
-                    <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
+                    <button 
+                      onClick={() => setEditingProperty(property)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                    >
+                      Edit
+                    </button>
                     <button onClick={() => handleDeleteProperty(property.id)} className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
                     <button 
                       onClick={() => handleStatusToggle(property.id, property.status || 'available')}
